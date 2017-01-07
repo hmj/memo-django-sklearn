@@ -1,0 +1,4 @@
+Django==1.10.5
+djangorestframework==3.5.3
+numpy==1.11.3
+scikit-learn==0.18.1
