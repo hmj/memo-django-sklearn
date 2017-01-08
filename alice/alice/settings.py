@@ -120,3 +120,27 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Celery
+# http://docs.celeryproject.org/en/latest/getting-started/first-steps-with-celery.html#rabbitmq  #noqa
+CELERY_ALWAYS_EAGER = True
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+CELERY_SEND_EVENTS          = True
+CELERY_SEND_TASK_SENT_EVENT = True
+CELERY_TIMEZONE             = 'Asia/Tokyo'
+CELERY_ENABLE_UTC           = True
+CELERY_ACKS_LATE            = True
+CELERYD_PREFETCH_MULTIPLIER = 1
+BROKER_TRANSPORT_OPTIONS    = {'fanout_patterns': True, 'visibility_timeout': 10 * 60}  # 10分
+CELERY_TASK_RESULT_EXPIRES  = 18000
+CELERYD_HIJACK_ROOT_LOGGER  = False
+CELERY_DISABLE_RATE_LIMITS  = True
+
+BROKER_URL = 'redis://localhost:6379/1'
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_RESULT_BACKEND    = 'redis://localhost:6379/1'
+CELERY_TASK_SERIALIZER   = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT    = [
+    'json'
+]

@@ -4,6 +4,9 @@ from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.pipeline import Pipeline
 
+from celery import task, Task
+
+
 class Predictor:
     def __init__(self):
         self.created = timezone.datetime.now()
@@ -29,4 +32,8 @@ class Predictor:
 
 print('default_predict')
 default_predict = Predictor()
-# default_predict.load()
+
+@task
+def add(x, y):
+    return default_predict.load()
+

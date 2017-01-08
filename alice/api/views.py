@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .predictor import default_predict
-from .tasks import save_models
+from .tasks import save_models, upload
 
 
 class AnalysisView(APIView):
@@ -37,13 +37,18 @@ class AnalysisView(APIView):
 
 class PredictorView(APIView):
     def get(self, request, format=None):
-        return Response({
-            "created": default_predict.created,
-        })
+        t1 = time.clock()
+        data = OrderedDict([
+            ('created', default_predict.created),
+            ('time', time.clock() - t1),
+            ('dir', dir(default_predict))
+        ])
+
+        return Response(data)
 
     def post(self, request, format=None):
         t1 = time.clock()
-        default_predict.load()
+        upload()
         return Response({
             'time': time.clock() - t1
         })

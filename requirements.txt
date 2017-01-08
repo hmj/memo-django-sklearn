@@ -1,5 +1,11 @@
+amqp==2.1.4
+billiard==3.5.0.2
+celery==4.0.2
 Django==1.10.5
 djangorestframework==3.5.3
+kombu==4.0.2
 numpy==1.11.3
+pytz==2016.10
 scikit-learn==0.18.1
 scipy==0.18.1
+vine==1.1.3

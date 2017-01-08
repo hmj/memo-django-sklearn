@@ -3,6 +3,11 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.datasets import fetch_20newsgroups
 
+from celery import shared_task
+
+from .predictor import default_predict
+
+
 def save_models():
     dataset = fetch_20newsgroups(shuffle=True, random_state=1,
                                  remove=('headers', 'footers', 'quotes'))
@@ -19,4 +24,8 @@ def save_models():
                                     random_state=0)
     lda.fit(tf)
     joblib.dump(lda, 'lda.pkl')
+
+@shared_task
+def upload():
+    return default_predict.load()
 
