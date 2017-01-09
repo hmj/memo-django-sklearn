@@ -11,29 +11,20 @@ class Predictor:
     def __init__(self):
         self.created = timezone.datetime.now()
 
+    def analyze(self, name):
+        lst = self.vectorizer.build_analyzer()(name)
+        lst.sort()
+        return ' '.join(lst)
+
     def load(self):
-        self.nanika1 = joblib.load('tf_vectorizer.pkl')
-        self.nanika2 = joblib.load('lda.pkl')
+        self.vectorizer = joblib.load('tf_vectorizer.pkl')
         self.lda = Pipeline([
-            ('vect', self.nanika1),
-            ('clf', self.nanika2)
+            ('vect', self.vectorizer),
+            ('clf', joblib.load('lda.pkl'))
         ])
+        self.loaded = True
 
     def predict(self, name):
         return self.lda.transform([name])
 
-
-    def analyze(self, name):
-        _a = self.nanika1.build_analyzer()
-        res = _a(name)
-        return res
-
     __call__ = predict
-
-print('default_predict')
-default_predict = Predictor()
-
-@task
-def add(x, y):
-    return default_predict.load()
-

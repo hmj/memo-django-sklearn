@@ -1,31 +1,44 @@
+from django.core.cache import cache
+
 from sklearn.externals import joblib
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.datasets import fetch_20newsgroups
 
+from .models import CountVectorizerParameter, TopicModelParamter
+from .predictor import Predictor
+
 from celery import shared_task
 
-from .predictor import default_predict
 
+def get_topicwords_key(name):
+    return "topicwords:{0}".format(name)
 
 def save_models():
     dataset = fetch_20newsgroups(shuffle=True, random_state=1,
                                  remove=('headers', 'footers', 'quotes'))
     data_samples = dataset.data[:2000]
 
-    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, max_features=2000, stop_words='english')
+    params = CountVectorizerParameter.get_params()
+    print(params)
+    tf_vectorizer = CountVectorizer(**params)
     tf_vectorizer.fit(data_samples)
     tf = tf_vectorizer.fit_transform(data_samples)
     joblib.dump(tf_vectorizer, 'tf_vectorizer.pkl')
 
-    lda = LatentDirichletAllocation(n_topics=10, max_iter=5,
-                                    learning_method='online',
-                                    learning_offset=50.,
-                                    random_state=0)
+    params = TopicModelParamter.get_params()
+    print(params)
+    lda = LatentDirichletAllocation(**params)
     lda.fit(tf)
     joblib.dump(lda, 'lda.pkl')
 
-@shared_task
-def upload():
-    return default_predict.load()
 
+def upload_predictor():
+    """
+    cacheにpredictorをセットする
+
+    :return:
+    """
+    clf = Predictor()
+    clf.load()
+    cache.set('__predictor', clf, 3600)
